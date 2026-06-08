@@ -1,10 +1,13 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { Redis } from '@upstash/redis';
 import dotenv from 'dotenv';
+import redisClient from './utils/redisClient.js';
 import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
+import authRoutes from './routes/authRoutes.js';
+import keyRoutes from './routes/keyRoutes.js';
+import { registerChatHandlers } from './sockets/chatSocket.js';
 
 dotenv.config();
 
@@ -20,6 +23,10 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/keys', keyRoutes);
+
 // MongoDB is strictly for Identity Management (Auth). Chat data never touches this database.
 const mongoUri = process.env.MONGODB_URI;
 if (mongoUri) {
@@ -30,24 +37,10 @@ if (mongoUri) {
   console.log('MongoDB connection string (MONGODB_URI) is missing in environment.');
 }
 
-// Connect Node server to Upstash Redis using @upstash/redis. 
-// This will act as your ephemeral message queue and public key directory.
-const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-let redis;
-if (redisUrl && redisToken) {
-  redis = new Redis({
-    url: redisUrl,
-    token: redisToken,
-  });
-
-  // Test Redis connection
-  redis.ping()
+if (redisClient) {
+  redisClient.ping()
     .then(() => console.log('Connected to Upstash Redis'))
     .catch((err) => console.error('Redis connection error:', err));
-} else {
-  console.log('Upstash Redis credentials are missing in environment.');
 }
 
 app.get('/health', (req, res) => {
@@ -56,6 +49,9 @@ app.get('/health', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
+  
+  // Register the real-time chat relay handlers
+  registerChatHandlers(io, socket);
   
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
