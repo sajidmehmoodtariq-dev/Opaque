@@ -1,0 +1,43 @@
+{
+  "name": "opaque",
+  "version": "1.0.0",
+  "description": "backend for my chatapp",
+  "keywords": [
+    "nodejs",
+    "express",
+    "mongodb",
+    "redis",
+    "chatapp",
+    "backend"
+  ],
+  "homepage": "https://github.com/sajidmehmoodtariq-dev/Opaque#readme",
+  "bugs": {
+    "url": "https://github.com/sajidmehmoodtariq-dev/Opaque/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sajidmehmoodtariq-dev/Opaque.git"
+  },
+  "license": "ISC",
+  "author": "Sajid Mehmood Tariq",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.38.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.6.3",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.3",
+    "speakeasy": "^2.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
